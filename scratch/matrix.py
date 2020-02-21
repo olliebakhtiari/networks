@@ -86,6 +86,15 @@ class Matrix:
 
         return mat
 
+    @classmethod
+    def flatten_matrix(cls, matrix):
+        flattened = []
+        for i in range(matrix.m):
+            for j in range(matrix.n):
+                flattened.append(matrix.data[i][j])
+
+        return flattened
+
     def get_shape(self):
         return self.m, self.n
 

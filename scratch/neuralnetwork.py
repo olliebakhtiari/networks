@@ -16,6 +16,7 @@ class NeuralNetwork:
                     3. Output layer with 'x' number of neurons.
 
     """
+    IMPLEMENTED_ACTIVATIONS = ['sigmoid', 'relu', 'parametric_relu', 'leaky_relu', 'tanh']
 
     def __init__(
             self,
@@ -49,9 +50,33 @@ class NeuralNetwork:
             precision=3,
         )
 
-        # Bias values. Single column vectors.
-        self.hidden_bias = Matrix(m=self.hidden_nodes, n=1)
-        self.output_bias = Matrix(m=self.output_nodes, n=1)
+        # Bias values. Single column vectors. Initialise randomly.
+        self.hidden_bias = Matrix.construct_random_matrix(
+            m=self.hidden_nodes,
+            n=1,
+            low=-1,
+            high=1,
+            d_type='float',
+            precision=3,
+        )
+        self.output_bias = Matrix.construct_random_matrix(
+            m=self.output_nodes,
+            n=1,
+            low=-1,
+            high=1,
+            d_type='float',
+            precision=3,
+        )
+
+    @property
+    def activation_function(self):
+        return self._activation_function
+
+    @activation_function.setter
+    def activation_function(self, value):
+        if value not in self.IMPLEMENTED_ACTIVATIONS:
+            raise NotImplementedError('cant use activation function specified.')
+        self._activation_function = value
 
     @property
     def learning_rate(self):
@@ -63,9 +88,27 @@ class NeuralNetwork:
             raise ValueError('learning rate must be greater than 0.')
         self._learning_rate = value
 
-    def apply_activation(self, value):
-        return getattr(Activations(value), self.activation_function)()
+    def apply_activation(self, matrix: Matrix):
+        for i in range(matrix.m):
+            for j in range(matrix.n):
+                value = matrix.data[i][j]
+                matrix.data[i][j] = getattr(Activations(value), self.activation_function)()
 
-    def feed_forward(self, input_: list):
-        output_of_hidden_layer = self.input_to_hidden_weights * Matrix.construct_matrix_from_lists([input_])
-        output_of_hidden_layer + self.hidden_bias
+    def feed_forward(self, inputs: list):
+        input_matrix = Matrix.construct_matrix_from_lists(inputs)
+
+        # Calculate hidden layer outputs.
+        output_of_hidden_layer = (self.input_to_hidden_weights * input_matrix) + self.hidden_bias
+        self.apply_activation(output_of_hidden_layer)
+
+        # Calculate output layer outputs.
+        output_of_output_layer = (self.hidden_to_output_weights * output_of_hidden_layer) + self.output_bias
+        self.apply_activation(output_of_output_layer)
+
+        return Matrix.flatten_matrix(output_of_output_layer)
+
+
+if __name__ == '__main__':
+    nn = NeuralNetwork(2, 2, 1, learning_rate=0.1)
+    print(nn.feed_forward([[1], [0]]))
+
