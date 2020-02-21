@@ -97,7 +97,7 @@ class NeuralNetwork:
             raise ValueError('learning rate must be greater than 0.')
         self._learning_rate = value
 
-    def apply_activation(self, matrix: Matrix, reverse=False, return_new_matrix=False):
+    def apply_or_reverse_activation(self, matrix: Matrix, reverse=False, return_new_matrix=False):
         func = self.activation_function
         if reverse:
             func = self.reverse_activation
@@ -120,10 +120,10 @@ class NeuralNetwork:
 
         # Calculate layer outputs. Outputs(layer) = ReLU(Weights(layer) * Inputs(layer) + Biases(layer)).
         output_of_hidden_layer = (self.input_to_hidden_weights * input_matrix) + self.hidden_bias
-        self.apply_activation(output_of_hidden_layer)
+        self.apply_or_reverse_activation(output_of_hidden_layer)
 
         output_of_output_layer = (self.hidden_to_output_weights * output_of_hidden_layer) + self.output_bias
-        self.apply_activation(output_of_output_layer)
+        self.apply_or_reverse_activation(output_of_output_layer)
 
         return output_of_output_layer
 
@@ -138,10 +138,10 @@ class NeuralNetwork:
 
         # Calculate layer outputs. Outputs(layer) = ReLU(Weights(layer) * Inputs(layer) + Biases(layer)).
         output_of_hidden_layer = (self.input_to_hidden_weights * input_matrix) + self.hidden_bias
-        self.apply_activation(output_of_hidden_layer)
+        self.apply_or_reverse_activation(output_of_hidden_layer)
 
         output_of_output_layer = (self.hidden_to_output_weights * output_of_hidden_layer) + self.output_bias
-        self.apply_activation(output_of_output_layer)
+        self.apply_or_reverse_activation(output_of_output_layer)
 
         targets_matrix = Matrix.construct_matrix_from_lists(targets)
 
@@ -149,15 +149,19 @@ class NeuralNetwork:
         output_errors = targets_matrix - output_of_output_layer
 
         # Output layer gradients.
-        oe_gradient = self.apply_activation(output_of_output_layer, reverse=True, return_new_matrix=True)
-        grad_o = oe_gradient * output_errors
+        oe_gradients = self.apply_or_reverse_activation(
+            matrix=output_of_output_layer,
+            reverse=True,
+            return_new_matrix=True,
+        )
+        grad_o = oe_gradients * output_errors
         grad_o.scalar_mult(self.learning_rate)
 
         # Get deltas.
         hidden_outputs_transposed = output_of_hidden_layer.get_transpose()
         ho_weights_deltas = grad_o * hidden_outputs_transposed
 
-        # Adjust weights.
+        # Adjust weights and bias.
         self.hidden_to_output_weights = self.hidden_to_output_weights + ho_weights_deltas
         self.output_bias = self.output_bias + grad_o
 
@@ -165,7 +169,24 @@ class NeuralNetwork:
         ho_weights_transposed = self.hidden_to_output_weights.get_transpose()
         hidden_errors = ho_weights_transposed * output_errors
 
-        return
+        # Hidden layer gradients.
+        he_gradients = self.apply_or_reverse_activation(
+            matrix=output_of_hidden_layer,
+            reverse=True,
+            return_new_matrix=True,
+        )
+        grad_h = he_gradients * hidden_errors
+        grad_h.scalar_mult(self.learning_rate)
+
+        # Get input to hidden deltas.
+        inputs_transposed = input_matrix.get_transpose()
+        ih_weights_deltas = grad_h * inputs_transposed
+
+        # Adjust weights and bias.
+        self.input_to_hidden_weights = self.input_to_hidden_weights + ih_weights_deltas
+        self.hidden_bias = self.hidden_bias + grad_h
+
+        return self
 
 
 if __name__ == '__main__':
