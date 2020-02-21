@@ -19,7 +19,7 @@ def get_wind_energy():
         infer_datetime_format=True,
         cache_dates=True,
     )
-    # upsample data to match 10min intervals.
+    # up-sample data to match 10min intervals.
     wind_upsampled = wind_energy.resample('10T').mean()
     wind_upsampled_interpolated = wind_upsampled.interpolate(method='spline', order=2)
 
@@ -43,7 +43,7 @@ def get_solar_energy():
         infer_datetime_format=True,
         cache_dates=True,
     )
-    # no need to upsample as already in 10min intervals.
+    # no need to up-sample as already in 10min intervals.
 
     # get values as an array of arrays excluding the times and dates, suitable input for neural networks.
     se_power = []

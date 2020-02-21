@@ -20,7 +20,7 @@ from data.preprocessing import get_weather_10_min_interval, get_wind_energy
 
 # tensorboard launch command - python -m tensorboard.main --logdir=~/logs --host=127.0.0.1
 NAME = f'deep_nn_model-{int(time.time())}'
-tensorboard = TensorBoard(log_dir=f'logs/{NAME}')
+tensor_board = TensorBoard(log_dir=f'logs/{NAME}')
 
 inputs = get_weather_10_min_interval()
 outputs = get_wind_energy()
@@ -81,7 +81,7 @@ history = model.fit(
     batch_size=32,
     epochs=500,
     validation_split=0.1,
-    callbacks=[tensorboard, reduce_lr, earlystopper],
+    callbacks=[tensor_board, reduce_lr, earlystopper],
 )
 history_dict = history.history
 val_loss = model.evaluate(np.array(x_test), np.array(y_test))

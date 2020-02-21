@@ -1,9 +1,11 @@
+# Python standard.
 import random
+from typing import List
 
 
 class Matrix:
-    def __init__(self, m, n, zeroes=True):
-        """ rows x columns. """
+    def __init__(self, m: int, n: int, zeroes=True):
+        """ m x n - > rows x columns. """
         if zeroes:
             self.data = [[0] * n for _ in range(m)]
         else:
@@ -56,7 +58,7 @@ class Matrix:
         return mul_mat
 
     @classmethod
-    def construct_matrix(cls, data):
+    def construct_matrix(cls, data: List[list]):
         m = len(data)
         n = len(data[0])
         if any([len(row) != n for row in data[1:]]):
@@ -67,18 +69,18 @@ class Matrix:
         return mat
 
     @classmethod
-    def construct_matrix_from_list(cls, list_of_lists):
-        return cls.construct_matrix(list_of_lists[:])
+    def construct_matrix_from_lists(cls, lists: List[list]):
+        return cls.construct_matrix(lists[:])
 
     @classmethod
-    def construct_random_matrix(cls, m, n, low=0, high=10, d_type='int', precision=3):
+    def construct_random_matrix(cls, m: int, n: int, low=0, high=10, d_type='float', precision=3):
         mat = Matrix(m, n, zeroes=False)
         if d_type == 'int':
             for x in range(m):
                 mat.data.append([random.randrange(low, high) for _ in range(mat.n)])
         elif d_type == 'float':
             for x in range(m):
-                mat.data.append([round(random.random(), precision) for _ in range(mat.n)])
+                mat.data.append([round(random.uniform(low, high), precision) for _ in range(mat.n)])
         else:
             raise NotImplementedError('data type not supported.')
 
@@ -111,9 +113,13 @@ class MatrixError(Exception):
 
 
 if __name__ == '__main__':
-    matrix = Matrix.construct_random_matrix(4, 4, d_type='float', precision=3)
-    print(matrix)
-    m2 = Matrix.construct_random_matrix(4, 4, d_type='float', precision=3)
-    print(m2)
-    print(matrix * m2)
+    a = Matrix.construct_matrix_from_lists([[1, 2, 3, 4]])
+    print(a)
+    b = Matrix.construct_matrix_from_lists([[1, 2], [3, 4]])
+    print(b)
+    matrix_one = Matrix.construct_random_matrix(m=4, n=4, low=-1, high=1, d_type='float', precision=3)
+    print(matrix_one)
+    matrix_two = Matrix.construct_random_matrix(m=4, n=4, low=-1, high=1, d_type='float', precision=3)
+    print(matrix_two)
+    print(matrix_one * matrix_two)
 

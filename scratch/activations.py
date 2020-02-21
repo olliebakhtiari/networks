@@ -22,7 +22,7 @@ class Activations:
 
         :param da: Derivative. Backpropagation requires knowing the derivative of the loss function with respect to the
                    weights and biases. Chain rule required to calculate as the equation of the loss function does not
-                   contain the weights and biases
+                   contain the weights and biases.
         :return:
         """
         s = self.sigmoid()
@@ -66,7 +66,7 @@ class Activations:
 
         :return:
         """
-        return
+        raise NotImplementedError
 
     def tanh(self):
         """ Tanh function is also sigmoidal (“s”-shaped), but instead outputs values that range (-1, 1). Thus strongly

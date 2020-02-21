@@ -1,5 +1,6 @@
 # Local.
 from scratch.activations import Activations
+from scratch.matrix import Matrix
 
 
 class NeuralNetwork:
@@ -16,13 +17,41 @@ class NeuralNetwork:
 
     """
 
-    def __init__(self, input_neurons, hidden_neurons, output_neurons, learning_rate, activation_function='relu'):
-        """ Define shape of the data. """
+    def __init__(
+            self,
+            input_neurons: int,
+            hidden_neurons: int,
+            output_neurons: int,
+            learning_rate: float,
+            activation_function='relu',
+    ):
         self.input_nodes = input_neurons
         self.hidden_nodes = hidden_neurons
         self.output_nodes = output_neurons
         self.learning_rate = learning_rate
         self.activation_function = activation_function
+
+        # Weights between layers. Initialise randomly.
+        self.input_to_hidden_weights = Matrix.construct_random_matrix(
+            m=self.hidden_nodes,
+            n=self.input_nodes,
+            low=-1,
+            high=1,
+            d_type='float',
+            precision=3,
+        )
+        self.hidden_to_output_weights = Matrix.construct_random_matrix(
+            m=self.output_nodes,
+            n=self.hidden_nodes,
+            low=-1,
+            high=1,
+            d_type='float',
+            precision=3,
+        )
+
+        # Bias values. Single column vectors.
+        self.hidden_bias = Matrix(m=self.hidden_nodes, n=1)
+        self.output_bias = Matrix(m=self.output_nodes, n=1)
 
     @property
     def learning_rate(self):
@@ -37,5 +66,6 @@ class NeuralNetwork:
     def apply_activation(self, value):
         return getattr(Activations(value), self.activation_function)()
 
-    def feed_forward(self):
-        pass
+    def feed_forward(self, input_: list):
+        output_of_hidden_layer = self.input_to_hidden_weights * Matrix.construct_matrix_from_lists([input_])
+        output_of_hidden_layer + self.hidden_bias
