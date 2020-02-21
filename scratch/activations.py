@@ -12,23 +12,19 @@ class Activations:
 
             Range: (0,1).
 
-        :param x: input.
         :return: f(x).
         """
         return 1 / (1 + np.exp(-self.x))
 
-    def reverse_sigmoid(self, da):
-        """ Used for backpropagation.
+    def reverse_sigmoid(self):
+        """ Derivative of Sigmoid.
 
-        :param da: Derivative. Backpropagation requires knowing the derivative of the loss function with respect to the
-                   weights and biases. Chain rule required to calculate as the equation of the loss function does not
-                   contain the weights and biases.
-        :return:
+        :return: dsigmoid.
         """
         s = self.sigmoid()
         ds = s * (1 - s)
 
-        return da * ds
+        return self.x * ds
 
     def relu(self):
         """ Linear (identity) for all positive values, and zero for all negative values.
@@ -44,7 +40,6 @@ class Activations:
 
             Range: (-infinity, infinity).
 
-        :param x: input.
         :return: f(x).
         """
         return self.x if self.x > 0 else 0.01 * self.x

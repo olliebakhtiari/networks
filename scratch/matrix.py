@@ -95,6 +95,11 @@ class Matrix:
 
         return flattened
 
+    def scalar_mult(self, value):
+        for i in range(self.m):
+            for j in range(self.n):
+                self.data[i][j] = self.data[i][j] * value
+
     def get_shape(self):
         return self.m, self.n
 
