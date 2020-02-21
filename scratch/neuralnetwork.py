@@ -18,12 +18,12 @@ class NeuralNetwork:
 
     IMPLEMENTED_ACTIVATIONS = [
         'sigmoid',
-        'reverse_sigmoid',
         'relu',
         'parametric_relu',
         'leaky_relu',
         'tanh',
     ]
+    IMPLEMENTED_REVERSE_ACTIVATIONS = ['reverse_sigmoid']
 
     def __init__(
             self,
@@ -86,6 +86,16 @@ class NeuralNetwork:
         if value not in self.IMPLEMENTED_ACTIVATIONS:
             raise NotImplementedError('cant use activation function specified.')
         self._activation_function = value
+
+    @property
+    def reverse_activation(self):
+        return self._reverse_activation
+
+    @reverse_activation.setter
+    def reverse_activation(self, value):
+        if value not in self.IMPLEMENTED_REVERSE_ACTIVATIONS:
+            raise NotImplementedError('cant use reverse activation function specified.')
+        self._reverse_activation = value
 
     @property
     def learning_rate(self):
