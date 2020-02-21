@@ -20,30 +20,30 @@ class NeuralNetwork:
 
     def __init__(
             self,
-            input_neurons: int,
-            hidden_neurons: int,
-            output_neurons: int,
+            input_layer_nodes: int,
+            hidden_layer_nodes: int,
+            output_layer_nodes: int,
             learning_rate: float,
             activation_function='relu',
     ):
-        self.input_nodes = input_neurons
-        self.hidden_nodes = hidden_neurons
-        self.output_nodes = output_neurons
+        self.input_layer_nodes = input_layer_nodes
+        self.hidden_layer_nodes = hidden_layer_nodes
+        self.output_layer_nodes = output_layer_nodes
         self.learning_rate = learning_rate
         self.activation_function = activation_function
 
         # Weights between layers. Initialise randomly.
         self.input_to_hidden_weights = Matrix.construct_random_matrix(
-            m=self.hidden_nodes,
-            n=self.input_nodes,
+            m=self.hidden_layer_nodes,
+            n=self.input_layer_nodes,
             low=-1,
             high=1,
             d_type='float',
             precision=3,
         )
         self.hidden_to_output_weights = Matrix.construct_random_matrix(
-            m=self.output_nodes,
-            n=self.hidden_nodes,
+            m=self.output_layer_nodes,
+            n=self.hidden_layer_nodes,
             low=-1,
             high=1,
             d_type='float',
@@ -52,7 +52,7 @@ class NeuralNetwork:
 
         # Bias values. Single column vectors. Initialise randomly.
         self.hidden_bias = Matrix.construct_random_matrix(
-            m=self.hidden_nodes,
+            m=self.hidden_layer_nodes,
             n=1,
             low=-1,
             high=1,
@@ -60,7 +60,7 @@ class NeuralNetwork:
             precision=3,
         )
         self.output_bias = Matrix.construct_random_matrix(
-            m=self.output_nodes,
+            m=self.output_layer_nodes,
             n=1,
             low=-1,
             high=1,
@@ -94,21 +94,36 @@ class NeuralNetwork:
                 value = matrix.data[i][j]
                 matrix.data[i][j] = getattr(Activations(value), self.activation_function)()
 
-    def feed_forward(self, inputs: list):
+    def feedforward(self, inputs: list):
         input_matrix = Matrix.construct_matrix_from_lists(inputs)
 
-        # Calculate hidden layer outputs.
+        # Calculate layer outputs. Outputs(layer) = Weights(layer) * Inputs(layer) + Biases(layer).
         output_of_hidden_layer = (self.input_to_hidden_weights * input_matrix) + self.hidden_bias
         self.apply_activation(output_of_hidden_layer)
 
-        # Calculate output layer outputs.
         output_of_output_layer = (self.hidden_to_output_weights * output_of_hidden_layer) + self.output_bias
         self.apply_activation(output_of_output_layer)
 
-        return Matrix.flatten_matrix(output_of_output_layer)
+        return output_of_output_layer
+
+    def backpropagation(self, inputs, targets):
+        outputs = self.feedforward(inputs)
+        targets_matrix = Matrix.construct_matrix_from_lists(targets)
+
+        # Output layer errors.
+        output_errors = targets_matrix - outputs
+
+        # Hidden layer errors.
+        ho_weights_transposed = self.hidden_to_output_weights.get_transpose()
+        hidden_errors = ho_weights_transposed * output_errors
+
+        return hidden_errors, output_errors
 
 
 if __name__ == '__main__':
+    i = [[1], [0]]
+    t = [[1]]
     nn = NeuralNetwork(2, 2, 1, learning_rate=0.1)
-    print(nn.feed_forward([[1], [0]]))
+    # print(Matrix.flatten_matrix(nn.feedforward(i)))
+    # print(nn.learn(i, t))
 
