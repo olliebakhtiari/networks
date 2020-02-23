@@ -10,7 +10,7 @@ TODO:
         - implement activations.
         - implement basic 3 layer neural network.
     
-    * With numpy:
+    * With NumPy:
         - build train neural network with public datasets.
     
     * With Keras:
@@ -30,6 +30,13 @@ The Coding Train:
 * https://www.youtube.com/user/shiffman
 
 ## Books, papers and other resources
+
+AI Resources:
+- https://www.coursera.org/learn/machine-learning#syllabus
+- Really good explanation on backpropagation: https://ml-cheatsheet.readthedocs.io/en/latest/backpropagation.html
+- Ian Goodfellow book:(quite mathematical) https://www.deeplearningbook.org
+- Multiple tutorials with keras: https://machinelearningmastery.com/start-here/#getstarted
+- pytorch: https://pytorch.org/tutorials/
 
 Michael Nielsen's book:
 * http://neuralnetworksanddeeplearning.com/
