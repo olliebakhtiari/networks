@@ -4,19 +4,19 @@ TODO:
 1. Refresh all theory, maths and calculus for Neural Nets and Deep Neural Nets.
 
 2. Build networks.
-    > From scratch with no libraries:
+    * From scratch with no libraries:
         - implement perceptron class.
         - implement matrix class.
         - implement activations.
         - implement basic 3 layer neural network.
     
-    > With numpy:
+    * With numpy:
         - build train neural network with public datasets.
     
-    > With Keras:
+    * With Keras:
         - Build most accurate model possible to predict wind/solar energy generation given weather forecasts.
     
-    > With PyTorch:
+    * With PyTorch:
         - Follow tutorials for building a CNN.
 
 -----
@@ -33,3 +33,9 @@ The Coding Train:
 
 Michael Nielsen's book:
 * http://neuralnetworksanddeeplearning.com/
+
+Chris Olah's blog:
+* http://colah.github.io/
+
+Distill publication:
+* https://distill.pub/
