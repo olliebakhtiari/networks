@@ -38,6 +38,9 @@ AI Resources:
 - Multiple tutorials with keras: https://machinelearningmastery.com/start-here/#getstarted
 - pytorch: https://pytorch.org/tutorials/
 
+Neural Network tutorial with NumPy:
+* https://www.python-course.eu/neural_networks_with_python_numpy.php
+
 Michael Nielsen's book:
 * http://neuralnetworksanddeeplearning.com/
 
