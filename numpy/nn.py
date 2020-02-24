@@ -27,6 +27,26 @@ def get_data():
     return data_set
 
 
+def get_labelled_data():
+    class_1 = [
+        (3, 4), (4.2, 5.3), (4, 3), (6, 5), (4, 6), (3.7, 5.8),
+        (3.2, 4.6), (5.2, 5.9), (5, 4), (7, 4), (3, 7), (4.3, 4.3),
+    ]
+    class_2 = [
+        (-3, -4), (-2, -3.5), (-1, -6), (-3, -4.3), (-4, -5.6),
+        (-3.2, -4.8), (-2.3, -4.3), (-2.7, -2.6), (-1.5, -3.6),
+        (-3.6, -5.6), (-4.5, -4.6), (-3.7, -5.8),
+    ]
+    labelled_data = []
+    for a in class_1:
+        labelled_data.append([a, [1, 0]])
+    for a in class_2:
+        labelled_data.append([a, [0, 1]])
+    np.random.shuffle(labelled_data)
+
+    return labelled_data
+
+
 @np.vectorize
 def sigmoid(x):
     """ https://docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.vectorize.html """
@@ -65,11 +85,11 @@ class NeuralNetwork:
 
         rad = 1 / np.sqrt(self.input_layer_nodes + bias_node)
         x = self._truncated_normal(mean=0, sd=1, low=-rad, upp=rad)
-        self.weights_in_hidden = x.rvs((self.hidden_layer_nodes, self.input_layer_nodes + bias_node))
+        self.weights_input_to_hidden = x.rvs((self.hidden_layer_nodes, self.input_layer_nodes + bias_node))
 
         rad = 1 / np.sqrt(self.hidden_layer_nodes + bias_node)
         x = self._truncated_normal(mean=0, sd=1, low=-rad, upp=rad)
-        self.weights_hidden_out = x.rvs((self.output_layer_nodes, self.hidden_layer_nodes + bias_node))
+        self.weights_hidden_to_output = x.rvs((self.output_layer_nodes, self.hidden_layer_nodes + bias_node))
 
     def feedforward(self, input_vector):
         """ The expit function, also known as the logistic sigmoid function, is defined as expit(x) = 1/(1+exp(-x)).
@@ -78,15 +98,15 @@ class NeuralNetwork:
 
         # input_vector can be tuple, list or ndarray
         if self.bias:
-            # adding bias node to the end of the inpuy_vector
+            # adding bias node to the end of the input_vector
             input_vector = np.concatenate((input_vector, [1]))
         input_vector = np.array(input_vector, ndmin=2).T
 
-        output_vector = np.dot(self.weights_in_hidden, input_vector)
+        output_vector = np.dot(self.weights_input_to_hidden, input_vector)
         output_vector = expit(output_vector)
         if self.bias:
             output_vector = np.concatenate((output_vector, [[1]]))
-        output_vector = np.dot(self.weights_hidden_out, output_vector)
+        output_vector = np.dot(self.weights_hidden_to_output, output_vector)
         output_vector = expit(output_vector)
 
         return output_vector
@@ -99,24 +119,24 @@ class NeuralNetwork:
         input_vector = np.array(input_vector, ndmin=2).T
         target_vector = np.array(target_vector, ndmin=2).T
 
-        output_vector1 = np.dot(self.weights_in_hidden, input_vector)
-        output_vector_hidden = expit(output_vector1)
+        output_vector_1 = np.dot(self.weights_input_to_hidden, input_vector)
+        output_vector_hidden = expit(output_vector_1)
 
         if self.bias:
             output_vector_hidden = np.concatenate((output_vector_hidden, [[self.bias]]))
 
-        output_vector2 = np.dot(self.weights_hidden_out, output_vector_hidden)
-        output_vector_network = expit(output_vector2)
+        output_vector_2 = np.dot(self.weights_hidden_to_output, output_vector_hidden)
+        output_vector_network = expit(output_vector_2)
 
         output_errors = target_vector - output_vector_network
 
         # update the weights:
         tmp = output_errors * output_vector_network * (1.0 - output_vector_network)
         tmp = self.learning_rate * np.dot(tmp, output_vector_hidden.T)
-        self.weights_hidden_out += tmp
+        self.weights_hidden_to_output += tmp
 
         # calculate hidden errors:
-        hidden_errors = np.dot(self.weights_hidden_out.T, output_errors)
+        hidden_errors = np.dot(self.weights_hidden_to_output.T, output_errors)
 
         # update the weights:
         tmp = hidden_errors * output_vector_hidden * (1.0 - output_vector_hidden)
@@ -124,7 +144,7 @@ class NeuralNetwork:
             x = np.dot(tmp, input_vector.T)[:-1, :]
         else:
             x = np.dot(tmp, input_vector.T)
-        self.weights_in_hidden += self.learning_rate * x
+        self.weights_input_to_hidden += self.learning_rate * x
 
 
 if __name__ == '__main__':
@@ -133,6 +153,7 @@ if __name__ == '__main__':
         hidden_layer_nodes=10,
         output_layer_nodes=2,
         learning_rate=0.1,
+        bias=True,
     )
 
     # 1st env.
@@ -149,33 +170,19 @@ if __name__ == '__main__':
         print(point, cls1, cls2, end=": ")
         if cls1 > cls2:
             if label == (0.99, 0.01):
-                print("class1 correct", label)
+                print("class_1 correct", label)
             else:
-                print("class2 incorrect", label)
+                print("class_2 incorrect", label)
         else:
             if label == (0.01, 0.99):
-                print("class1 correct", label)
+                print("class_1 correct", label)
             else:
-                print("class2 incorrect", label)
+                print("class_2 incorrect", label)
 
     # 2nd env.
-    class1 = [
-        (3, 4), (4.2, 5.3), (4, 3), (6, 5), (4, 6), (3.7, 5.8),
-        (3.2, 4.6), (5.2, 5.9), (5, 4), (7, 4), (3, 7), (4.3, 4.3),
-    ]
-    class2 = [
-        (-3, -4), (-2, -3.5), (-1, -6), (-3, -4.3), (-4, -5.6),
-        (-3.2, -4.8), (-2.3, -4.3), (-2.7, -2.6), (-1.5, -3.6),
-        (-3.6, -5.6), (-4.5, -4.6), (-3.7, -5.8),
-    ]
-    labeled_data = []
-    for el in class1:
-        labeled_data.append([el, [1, 0]])
-    for el in class2:
-        labeled_data.append([el, [0, 1]])
-    np.random.shuffle(labeled_data)
-    print(labeled_data[:10])
-    data, labels = zip(*labeled_data)
+    labelled = get_labelled_data()
+    print(labelled[:10])
+    data, labels = zip(*labelled)
     labels = np.array(labels)
     data = np.array(data)
     for _ in range(20):

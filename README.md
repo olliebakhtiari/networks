@@ -11,7 +11,7 @@ TODO:
         - implement basic 3 layer neural network.
     
     * With NumPy:
-        - build train neural network with public datasets.
+        - Build and train neural network.
     
     * With Keras:
         - Build most accurate model possible to predict wind/solar energy generation given weather forecasts.
